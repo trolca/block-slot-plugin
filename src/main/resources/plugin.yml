@@ -2,3 +2,6 @@ name: BlockSlotPlugin
 version: '${project.version}'
 main: me.trololo11.blockslotplugin.BlockSlotPlugin
 api-version: '1.19'
+commands:
+  testcommand:
+    description: "A test command!"

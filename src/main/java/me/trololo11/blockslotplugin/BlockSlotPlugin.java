@@ -1,37 +1,26 @@
 package me.trololo11.blockslotplugin;
 
+import me.trololo11.blockslotplugin.commands.TestCommand;
+import me.trololo11.blockslotplugin.listeners.SlotsEditBlock;
+import me.trololo11.blockslotplugin.managers.SlotsManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.io.BukkitObjectOutputStream;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Base64;
-import java.util.UUID;
 
 public final class BlockSlotPlugin extends JavaPlugin {
 
+    private SlotsManager slotsManager;
+
     @Override
     public void onEnable() {
+        slotsManager = new SlotsManager();
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        BukkitObjectOutputStream bukkitStream = null;
-        try {
-            bukkitStream = new BukkitObjectOutputStream(outputStream);
+        getCommand("testcommand").setExecutor(new TestCommand(slotsManager));
 
-            bukkitStream.writeObject(null);
-
-            bukkitStream.close();
-
-            System.out.println(Base64.getEncoder().encodeToString(outputStream.toByteArray()));
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        getServer().getPluginManager().registerEvents(new SlotsEditBlock(), this);
 
     }
 
-    @Override
-    public void onDisable() {
-
+    public static BlockSlotPlugin getPlugin(){
+        return getPlugin(BlockSlotPlugin.class);
     }
 }
