@@ -22,15 +22,6 @@ public class TestCommand implements CommandExecutor {
 
         if(!(sender instanceof Player)) return true;
 
-        Player player = (Player) sender;
-
-        ArrayList<SlotType> inv = new ArrayList<>(37);
-
-        for(int i=0; i < 37; i++)
-            inv.add(SlotType.BLOCKED);
-
-        slotsManager.setPlayerInvSlots(player, inv);
-
         return true;
     }
 }
