@@ -39,8 +39,6 @@ public class MainEditSlotsMenu extends Menu {
         }
 
         currSlots = slotsManager.getPlayerInvSlots(editPlayer);
-        System.out.println(Arrays.toString(currSlots));
-        System.out.println("fasdjasdfkhbafdjhbjfashdb");
         freeSlot = Utils.createItem(Material.WHITE_STAINED_GLASS_PANE, " ", "free-slot");
     }
 
@@ -95,8 +93,6 @@ public class MainEditSlotsMenu extends Menu {
         ItemStack item = e.getCurrentItem();
         Player player = (Player) e.getWhoClicked();
 
-        System.out.println(item.getItemMeta().getLocalizedName());
-        System.out.println(item.getItemMeta().getLocalizedName().startsWith("invcustomslot"));
         if(item.getItemMeta().getLocalizedName().startsWith("invcustomslot")) {
             setSlotTypeFromSlot(e.getSlot(), null);
             e.getInventory().setItem(e.getSlot(), freeSlot);
@@ -140,7 +136,6 @@ public class MainEditSlotsMenu extends Menu {
             case GREEN_DYE -> {
                 if(!Utils.isLocalizedEqual(item.getItemMeta(), "apply")) return;
 
-                System.out.println(Arrays.toString(currSlots));
                 slotsManager.setPlayerInvSlots(editPlayer, currSlots);
                 player.sendMessage(ChatColor.GREEN + "Successfully set the custom slots for "+ editPlayer.getName());
                 player.closeInventory();
