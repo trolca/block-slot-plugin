@@ -17,7 +17,8 @@ public class SlotsEditBlock implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e){
-        e.setCancelled(checkIfCancel(e.getCurrentItem()));
+        if(checkIfCancel(e.getCurrentItem()))
+            e.setCancelled(true);
     }
 
     @EventHandler

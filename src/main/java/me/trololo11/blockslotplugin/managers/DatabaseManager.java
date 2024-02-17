@@ -1,17 +1,9 @@
 package me.trololo11.blockslotplugin.managers;
 
-import me.trololo11.blockslotplugin.BlockSlotPlugin;
 import me.trololo11.blockslotplugin.utils.SlotType;
-import org.bukkit.entity.Player;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Base64;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -24,6 +16,8 @@ public interface DatabaseManager {
      * Initializes the database. Should be called to start the database.
      */
     void initialize() throws SQLException, IOException;
+
+    void close();
 
     /**
      * Saves the player's current slots to the database. <br>

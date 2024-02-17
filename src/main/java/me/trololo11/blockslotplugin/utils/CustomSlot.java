@@ -1,6 +1,5 @@
 package me.trololo11.blockslotplugin.utils;
 
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -18,8 +17,14 @@ public abstract class CustomSlot {
 
     protected abstract ItemStack createItem();
 
+    /**
+     * Returns a <b>copy</b> of the item that is the label of this slot
+     * @return A <b>copy</b> of the item. <br>
+     *      Every item returned with this function has a localized name in
+     *      the template of "customslot-(slot type)"
+     */
     public ItemStack getItem(){
-        return item;
+        return item.clone();
     }
 
     public abstract SlotType getSlotType();

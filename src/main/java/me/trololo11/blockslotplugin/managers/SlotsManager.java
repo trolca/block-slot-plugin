@@ -56,25 +56,43 @@ public class SlotsManager {
     public void setPlayerInvSlots(Player player, SlotType[] invSlots){
         if(invSlots == null){
             removePlayerInvSlot(player);
-            player.getInventory().clear();
+            for(CustomSlot customSlot : customSlotsMap.values())
+                player.getInventory().remove(customSlot.getItem());
             return;
         }
-
         if(invSlots.length != 37)
             throw new IllegalArgumentException("The size of inv slots list should be 37!");
+
+        boolean everyNull = true;
+
+        SlotType[] oldSlots = playerInventorySlots.get(player);
 
         for(int i=0; i < 36; i++){
             SlotType slotType = invSlots[i];
 
-            if(slotType != null){
+            //ik I'm checking 2 times but idc
+            if(slotType != null)
+                everyNull = false;
+
+            if(slotType != null && (oldSlots == null || oldSlots[i] != slotType)){
                 ItemStack oldItem = player.getInventory().getItem(i);
 
                 if(oldItem != null) player.getWorld().dropItemNaturally(player.getLocation(), oldItem);
                 player.getInventory().setItem(i, customSlotsMap.get(slotType).getItem());
+            }else if(slotType == null && oldSlots != null && oldSlots[i] != null){
+                player.getInventory().setItem(i, null);
             }
         }
 
-        player.getInventory().setItem(40, customSlotsMap.get(invSlots[36]) == null ? null : customSlotsMap.get(invSlots[36]).getItem());
+        ItemStack offhandSlot = customSlotsMap.get(invSlots[36]) == null ? null : customSlotsMap.get(invSlots[36]).getItem();
+
+        if(offhandSlot != null) {
+            player.getInventory().setItem(40, offhandSlot);
+        }else if(everyNull){
+            removePlayerInvSlot(player);
+            return;
+        }
+
 
         playerInventorySlots.put(player, invSlots);
 
@@ -88,7 +106,20 @@ public class SlotsManager {
     public SlotType[] getPlayerInvSlots(Player player){
         SlotType[] slots = playerInventorySlots.get(player);
 
-        return slots == null ? null : Arrays.copyOf(slots, 37);
+        return slots == null ? new SlotType[37] : Arrays.copyOf(slots, 37);
+    }
+
+    public CustomSlot getSlotClass(SlotType slotType){
+        return customSlotsMap.get(slotType);
+    }
+
+    /**
+     * Returns a copy of the hash map which stores all of the {@link CustomSlot} classes
+     * of every {@link SlotType}.
+     * @return A <b>copy</b> of the hash map
+     */
+    public HashMap<SlotType, CustomSlot> getCustomSlotsMap() {
+        return (HashMap<SlotType, CustomSlot>) customSlotsMap.clone();
     }
 
     /**

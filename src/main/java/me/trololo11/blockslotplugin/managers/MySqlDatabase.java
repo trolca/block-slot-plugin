@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
 import java.util.UUID;
 
 public class MySqlDatabase implements DatabaseManager{
@@ -71,9 +70,16 @@ public class MySqlDatabase implements DatabaseManager{
 
     }
 
+    @Override
+    public void close() {
+        ds.close();
+    }
+
 
     @Override
     public void savePlayerSlots(UUID playerUuid, SlotType[] slots) throws SQLException, IOException {
+        if(slots == null)
+            return;
         Connection connection = getConnection();
 
         String encodedSlots = encodePlayerSlots(slots);

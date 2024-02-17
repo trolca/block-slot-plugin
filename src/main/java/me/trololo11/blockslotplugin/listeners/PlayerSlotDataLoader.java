@@ -38,14 +38,24 @@ public class PlayerSlotDataLoader implements Listener {
 
         SlotType[] slots = slotsManager.getPlayerInvSlots(player);
 
-        if(slots != null){
+        databaseManager.savePlayerSlots(player.getUniqueId(), slots);
+        slotsManager.removePlayerInvSlot(player);
+
+        if(arrayEntirelyNull(slots)){
+            if(databaseManager.playerSlotsModified(player.getUniqueId()))
+                databaseManager.removePlayerSlots(player.getUniqueId());
+        }else{
             databaseManager.savePlayerSlots(player.getUniqueId(), slots);
             slotsManager.removePlayerInvSlot(player);
-        }else if(databaseManager.playerSlotsModified(player.getUniqueId())) {
-            databaseManager.removePlayerSlots(player.getUniqueId());
         }
+    }
 
+    private boolean arrayEntirelyNull(SlotType[] slotTypes){
 
+        for(SlotType slotType : slotTypes)
+            if(slotType != null) return false;
+
+        return true;
     }
 
 }

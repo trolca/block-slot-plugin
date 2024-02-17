@@ -1,11 +1,15 @@
 package me.trololo11.blockslotplugin;
 
+import me.trololo11.blockslotplugin.commands.EditSlotsCommand;
 import me.trololo11.blockslotplugin.commands.TestCommand;
+import me.trololo11.blockslotplugin.listeners.MenuManager;
 import me.trololo11.blockslotplugin.listeners.SlotsEditBlock;
 import me.trololo11.blockslotplugin.listeners.PlayerSlotDataLoader;
 import me.trololo11.blockslotplugin.managers.DatabaseManager;
 import me.trololo11.blockslotplugin.managers.MySqlDatabase;
 import me.trololo11.blockslotplugin.managers.SlotsManager;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -43,11 +47,41 @@ public final class BlockSlotPlugin extends JavaPlugin {
         }
         slotsManager = new SlotsManager();
 
-        getCommand("testcommand").setExecutor(new TestCommand(slotsManager));
+        try {
+            loadData();
+        } catch (SQLException | IOException e) {
+            getLogger().severe("Error while loading data for online players!");
+            throw new RuntimeException(e);
+        }
 
+        getCommand("testcommand").setExecutor(new TestCommand(slotsManager));
+        getCommand("editslots").setExecutor(new EditSlotsCommand(slotsManager));
+
+        getServer().getPluginManager().registerEvents(new MenuManager(), this);
         getServer().getPluginManager().registerEvents(new PlayerSlotDataLoader(databaseManager, slotsManager), this);
         getServer().getPluginManager().registerEvents(new SlotsEditBlock(), this);
 
+    }
+
+    @Override
+    public void onDisable(){
+        try {
+            saveData();
+        } catch (SQLException | IOException e) {
+            getLogger().severe("Error while saving online's players data!");
+            throw new RuntimeException(e);
+        }
+        databaseManager.close();
+    }
+
+    private void loadData() throws SQLException, IOException {
+        for(Player player : Bukkit.getOnlinePlayers())
+            slotsManager.addPlayerInvSlots(player, databaseManager.getPlayerSlots(player.getUniqueId()));
+    }
+
+    private void saveData() throws SQLException, IOException {
+        for(Player player : Bukkit.getOnlinePlayers())
+            databaseManager.savePlayerSlots(player.getUniqueId(), slotsManager.getPlayerInvSlots(player));
     }
 
     public static BlockSlotPlugin getPlugin(){

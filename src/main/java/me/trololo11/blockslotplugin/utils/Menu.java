@@ -11,15 +11,15 @@ public abstract class Menu implements InventoryHolder {
 
     public abstract String getTitle();
 
-    public abstract void setMenuItems();
-
     public abstract int getSlots();
+
+    public abstract void setMenuItems();
 
     public abstract void handleMenu(InventoryClickEvent e);
 
     public void open(Player player){
         inventory = Bukkit.createInventory(this, getSlots(), Utils.chat(getTitle()));
-        setMenuItems();
+        this.setMenuItems();
 
         player.openInventory(inventory);
     }
