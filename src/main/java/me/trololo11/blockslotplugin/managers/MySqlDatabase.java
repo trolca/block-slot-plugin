@@ -3,7 +3,9 @@ package me.trololo11.blockslotplugin.managers;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import me.trololo11.blockslotplugin.BlockSlotPlugin;
+import me.trololo11.blockslotplugin.utils.Save;
 import me.trololo11.blockslotplugin.utils.SlotType;
+import org.bukkit.Material;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
@@ -58,6 +60,7 @@ public class MySqlDatabase implements DatabaseManager{
         Statement statement = connection.createStatement();
 
         statement.execute("CREATE TABLE IF NOT EXISTS players_slots(uuid char(36) primary key not null, slots_info text)");
+        statement.execute("CREATE TABLE IF NOT EXISTS player_saves(uuid char(36), icon varchar(50), title varchar(100), save_index int, slots_info text, PRIMARY KEY(uuid, save_index))");
 
         ResultSet results = statement.executeQuery("SELECT uuid FROM players_slots");
 
@@ -148,6 +151,86 @@ public class MySqlDatabase implements DatabaseManager{
     @Override
     public boolean playerSlotsModified(UUID playersUuid) {
         return existingUuids.contains(playersUuid);
+    }
+
+    @Override
+    public void addPlayerSave(UUID playersUuid, int saveIndex, Save save) throws SQLException, IOException {
+        Connection connection = getConnection();
+
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO player_saves VALUES (?, ?, ?,?,?)");
+
+        statement.setString(1, playersUuid.toString());
+        statement.setString(2, save.icon.toString());
+        statement.setString(3, save.name);
+        statement.setInt(4, saveIndex);
+        statement.setString(5, encodePlayerSlots(save.getSaveSlots()));
+
+        statement.executeUpdate();
+
+        statement.close();
+        connection.close();
+    }
+
+    @Override
+    public void updatePlayerSave(UUID playersUuid, int saveIndex, Save save) throws SQLException, IOException {
+        Connection connection = getConnection();
+        PreparedStatement statement = connection.prepareStatement("UPDATE player_saves SET icon = ?, name = ?, slots_info = ? WHERE uuid = ? AND save_index = ?");
+
+        statement.setString(1, save.icon.toString());
+        statement.setString(2, save.name);
+        statement.setString(3, encodePlayerSlots(save.getSaveSlots()));
+        statement.setString(4, playersUuid.toString());
+        statement.setInt(5, saveIndex);
+
+        statement.executeUpdate();
+
+        statement.close();
+        connection.close();
+    }
+
+    @Override
+    public void removePlayerSave(UUID playersUuid, int saveIndex) throws SQLException {
+        Connection connection = getConnection();
+        PreparedStatement deleteStatement = connection.prepareStatement("DELETE FROM player_saves WHERE uuid = ? AND save_index = ?");
+
+        deleteStatement.setString(1, playersUuid.toString());
+        deleteStatement.setInt(2, saveIndex);
+
+        deleteStatement.executeUpdate();
+
+        PreparedStatement saveIndexStatement = connection.prepareStatement("UPDATE players_saves SET save_index=save_index-1 WHERE uuid = ? AND save_index > ?");
+
+        saveIndexStatement.setString(1, playersUuid.toString());
+        saveIndexStatement.setInt(2, saveIndex);
+
+        saveIndexStatement.executeUpdate();
+
+        saveIndexStatement.close();
+        deleteStatement.close();
+        connection.close();
+    }
+
+    @Override
+    public ArrayList<Save> getPlayerSaves(UUID playersUuid) throws SQLException, IOException {
+        Connection connection = getConnection();
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM player_saves WHERE uuid = ? ORDER BY save_index DESC");
+
+        statement.setString(1, playersUuid.toString());
+        ResultSet results = statement.executeQuery();
+
+        ArrayList<Save> saves = new ArrayList<>();
+
+        while (results.next()){
+            SlotType[] slots = decodePlayerSlots(results.getString("slots_info"));
+            saves.add(new Save(Material.getMaterial(results.getString("icon")), results.getString("title"), slots));
+        }
+
+
+        results.close();
+        statement.close();
+        connection.close();
+
+        return saves;
     }
 
 

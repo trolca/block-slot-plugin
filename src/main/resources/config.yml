@@ -3,3 +3,5 @@ port: '' #leave empty to use the default (1433)
 user: 'root'
 password: ''
 database-name: 'block_slot_database'
+
+max-saves: 100 #Max number of saves if 0 or under there will be no limit

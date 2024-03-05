@@ -3,10 +3,12 @@ package me.trololo11.blockslotplugin;
 import me.trololo11.blockslotplugin.commands.EditSlotsCommand;
 import me.trololo11.blockslotplugin.commands.TestCommand;
 import me.trololo11.blockslotplugin.listeners.MenuManager;
+import me.trololo11.blockslotplugin.listeners.PlayerSavesDataLoader;
 import me.trololo11.blockslotplugin.listeners.SlotsEditBlock;
 import me.trololo11.blockslotplugin.listeners.PlayerSlotDataLoader;
 import me.trololo11.blockslotplugin.managers.DatabaseManager;
 import me.trololo11.blockslotplugin.managers.MySqlDatabase;
+import me.trololo11.blockslotplugin.managers.SavesManager;
 import me.trololo11.blockslotplugin.managers.SlotsManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,7 +22,10 @@ import java.util.Properties;
 public final class BlockSlotPlugin extends JavaPlugin {
 
     private SlotsManager slotsManager;
+    private SavesManager savesManager;
     private DatabaseManager databaseManager;
+
+    private int maxSaves;
 
     public final Properties dbProperties;
 
@@ -36,6 +41,8 @@ public final class BlockSlotPlugin extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
 
+        maxSaves = getConfig().getInt("max-saves");
+
         databaseManager = new MySqlDatabase();
         try {
             databaseManager.initialize();
@@ -46,6 +53,7 @@ public final class BlockSlotPlugin extends JavaPlugin {
             return;
         }
         slotsManager = new SlotsManager();
+        savesManager = new SavesManager(databaseManager);
 
         try {
             loadData();
@@ -55,10 +63,11 @@ public final class BlockSlotPlugin extends JavaPlugin {
         }
 
         getCommand("testcommand").setExecutor(new TestCommand(slotsManager));
-        getCommand("editslots").setExecutor(new EditSlotsCommand(slotsManager));
+        getCommand("editslots").setExecutor(new EditSlotsCommand(slotsManager, savesManager));
 
         getServer().getPluginManager().registerEvents(new MenuManager(), this);
         getServer().getPluginManager().registerEvents(new PlayerSlotDataLoader(databaseManager, slotsManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerSavesDataLoader(savesManager, databaseManager), this);
         getServer().getPluginManager().registerEvents(new SlotsEditBlock(), this);
 
     }
@@ -75,13 +84,19 @@ public final class BlockSlotPlugin extends JavaPlugin {
     }
 
     private void loadData() throws SQLException, IOException {
-        for(Player player : Bukkit.getOnlinePlayers())
+        for(Player player : Bukkit.getOnlinePlayers()) {
             slotsManager.addPlayerInvSlots(player, databaseManager.getPlayerSlots(player.getUniqueId()));
+            savesManager.addPlayerSaves(player, databaseManager.getPlayerSaves(player.getUniqueId()));
+        }
     }
 
     private void saveData() throws SQLException, IOException {
         for(Player player : Bukkit.getOnlinePlayers())
             databaseManager.savePlayerSlots(player.getUniqueId(), slotsManager.getPlayerInvSlots(player));
+    }
+
+    public int getMaxSaves() {
+        return maxSaves;
     }
 
     public static BlockSlotPlugin getPlugin(){

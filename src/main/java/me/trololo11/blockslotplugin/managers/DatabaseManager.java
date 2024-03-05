@@ -1,9 +1,11 @@
 package me.trololo11.blockslotplugin.managers;
 
+import me.trololo11.blockslotplugin.utils.Save;
 import me.trololo11.blockslotplugin.utils.SlotType;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -51,5 +53,36 @@ public interface DatabaseManager {
      * @return Whether the player has a record.
      */
     boolean playerSlotsModified(UUID playersUuid);
+
+    /**
+     * Adds a new save of slots to the database.
+     * @param playersUuid The player's uuid which save it is.
+     * @param saveIndex The index of the save.
+     * @param save An array which length is 37. (Follow {@link SlotsManager})
+     */
+    void addPlayerSave(UUID playersUuid, int saveIndex, Save save) throws SQLException, IOException;
+
+    /**
+     * Updates an already existing save in the database.
+     * @param playersUuid The player's uuid which save it is.
+     * @param saveIndex The index of the save we want to modify.
+     * @param save The array of the new save (Follow {@link SlotsManager})
+     */
+    void updatePlayerSave(UUID playersUuid, int saveIndex, Save save) throws SQLException, IOException;
+
+    /**
+     * Removes a specified players save. <br>
+     * This function also remaps every save's index which is after.
+     * @param playersUuid The player's uuid which save it is.
+     * @param saveIndex The index of the save we want to delete.
+     */
+    void removePlayerSave(UUID playersUuid, int saveIndex) throws SQLException;
+
+    /**
+     * Gets all the saves of the specified player.
+     * @param playersUuid The uuid of the player you want to get the saves from.
+     * @return An array list of the players saves.
+     */
+    ArrayList<Save> getPlayerSaves(UUID playersUuid) throws SQLException, IOException;
 
 }
