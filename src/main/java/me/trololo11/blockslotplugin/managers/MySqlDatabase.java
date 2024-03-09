@@ -225,7 +225,6 @@ public class MySqlDatabase implements DatabaseManager{
             saves.add(new Save(Material.getMaterial(results.getString("icon")), results.getString("title"), slots));
         }
 
-
         results.close();
         statement.close();
         connection.close();

@@ -49,7 +49,8 @@ public class Save {
 
     /**
      * Creates a display item of this save that can be used in an inventory.
-     * @param index The index of this save (the index of its place in the array)
+     * It's localized name is "save-(index)"
+     * @param index The index of the save
      * @param lore The lore to put in this item.
      * @return A display item of this save class.
      */
@@ -61,7 +62,7 @@ public class Save {
         ItemStack saveItem = new ItemStack(this.icon);
         ItemMeta saveMeta = saveItem.getItemMeta();
 
-        saveMeta.setDisplayName(Utils.chat("&2&lSave &a&l"+index+"&2&l: &a&l"+this.name));
+        saveMeta.setDisplayName(Utils.chat("&2&lSave &a&l"+(index+1)+"&2&l: &a&l"+this.name));
         saveMeta.setLocalizedName("save-"+index);
         saveMeta.setLore(loreArray);
         saveMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);

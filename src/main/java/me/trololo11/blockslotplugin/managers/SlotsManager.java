@@ -2,7 +2,9 @@ package me.trololo11.blockslotplugin.managers;
 
 import me.trololo11.blockslotplugin.utils.CustomSlot;
 import me.trololo11.blockslotplugin.utils.SlotType;
+import me.trololo11.blockslotplugin.utils.Utils;
 import me.trololo11.blockslotplugin.utils.slots.BlockedSlot;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -11,16 +13,29 @@ import java.util.*;
 /**
  * This class stores all the players slots data in an internal hash map.
  * The data of player slots is stored in an array where null is a normal slot and
- * a non-null value of {@link SlotType} is the specified slot type.
+ * a non-null value of {@link SlotType} is the specified slot type. <br>
+ * Every inv slots data list have the size of 37 (36 slots for the inv and 1 for the offhand)
+ * Indexes from 0-8 are the hotbar of the player, from 9-35 the inventory starting from the top left and index 36 is for the offhand.
  */
 public class SlotsManager {
 
-
+    /**
+     * A general item representing the null value in the custom slots array. It's localized name is "free-slot".
+     * It should be used to show a slot with no custom slot in the inventory
+     */
+    public static final ItemStack FREE_SLOT = Utils.createItem(Material.WHITE_STAINED_GLASS_PANE, " ", "free-slot");
+    /**
+     * A general item representing the null value in the custom slots array for the index 36 the offhand slot.
+     * It's localized name is "offhand-slot".
+     * It should be used to show that the offhand slot has no custom item in it.
+     */
+    public static final ItemStack OFFHAND_SLOT = Utils.createItem(Material.WHITE_STAINED_GLASS_PANE, "&b&lOffhand slot", "offhand-slot");
 
     /**
      * A hash map of every online player's inventory slots data. The key is the player
      * and the array which is the slot data which is more explained in the class doc.
-     * Every inv slots data list should have size of 37 (36 slots for the inv and 37 for the offhand)
+     * Every inv slots data list should have size of 37 (36 slots for the inv and 1 for the offhand) <br>
+     * Indexes from 0-8 are the hotbar of the player, from 9-35 the inventory starting from the top left and index 36 is for the offhand.
      */
     private HashMap<Player, SlotType[]> playerInventorySlots = new HashMap<>();
     private HashMap<SlotType, CustomSlot> customSlotsMap;
@@ -82,20 +97,18 @@ public class SlotsManager {
             }else if(slotType == null && oldSlots != null && oldSlots[i] != null){
                 player.getInventory().setItem(i, null);
             }
+
         }
 
         ItemStack offhandSlot = customSlotsMap.get(invSlots[36]) == null ? null : customSlotsMap.get(invSlots[36]).getItem();
+        player.getInventory().setItem(40, offhandSlot);
 
-        if(offhandSlot != null) {
-            player.getInventory().setItem(40, offhandSlot);
-        }else if(everyNull){
+        if(everyNull){
             removePlayerInvSlot(player);
             return;
         }
 
-
         playerInventorySlots.put(player, invSlots);
-
     }
 
     /**

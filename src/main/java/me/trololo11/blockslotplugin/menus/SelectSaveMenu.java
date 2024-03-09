@@ -1,10 +1,13 @@
 package me.trololo11.blockslotplugin.menus;
 
 import me.trololo11.blockslotplugin.managers.SavesManager;
+import me.trololo11.blockslotplugin.managers.SlotsManager;
+import me.trololo11.blockslotplugin.utils.ConfirmSaveFunction;
 import me.trololo11.blockslotplugin.utils.Menu;
 import me.trololo11.blockslotplugin.utils.Save;
 import me.trololo11.blockslotplugin.utils.Utils;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -15,23 +18,19 @@ public class SelectSaveMenu extends Menu {
 
     private MainEditSlotsMenu backMenu;
     private SavesManager savesManager;
+    private SlotsManager slotsManager;
     private int page;
 
-    public SelectSaveMenu(MainEditSlotsMenu backMenu,SavesManager savesManager){
+    public SelectSaveMenu(MainEditSlotsMenu backMenu,SavesManager savesManager, SlotsManager  slotsManager){
         this.backMenu = backMenu;
         this.savesManager = savesManager;
+        this.slotsManager = slotsManager;
         page = 0;
-    }
-
-    public SelectSaveMenu(MainEditSlotsMenu backMenu,  SavesManager savesManager, int page){
-        this.backMenu = backMenu;
-        this.savesManager = savesManager;
-        this.page = page;
     }
 
     @Override
     public String getTitle() {
-        return Utils.chat("&a&lSelect a save");
+        return "&a&lSelect a save";
     }
 
     @Override
@@ -62,7 +61,7 @@ public class SelectSaveMenu extends Menu {
             if(currIndex >= playerSaves.size()) break;
             Save save = playerSaves.get(currIndex);
 
-            inventory.setItem(i, save.createSaveItem(currIndex, "&7Click to edit!"));
+            inventory.setItem(i, save.createSaveItem(currIndex, "&7Click to see!"));
         }
 
         int maxPages = playerSaves.size()/36;
@@ -74,11 +73,26 @@ public class SelectSaveMenu extends Menu {
 
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Override
     public void handleMenu(InventoryClickEvent e) {
         ItemStack item = e.getCurrentItem();
         Player player = (Player) e.getWhoClicked();
 
+        if(item.getItemMeta().getLocalizedName().startsWith("save")){
+            String localizedName = item.getItemMeta().getLocalizedName();
+            int index = Integer.parseInt(localizedName.split("-")[1]);
+            Save save = savesManager.getPlayerSaves(player).get(index);
+
+            ConfirmSaveFunction saveFunction = save1 -> {
+                backMenu.setCurrSlots(save1.getSaveSlots());
+                backMenu.open(player);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, 1f);
+            };
+
+            new SeeSaveMenu(this, slotsManager, save, index, false, saveFunction).open(player);
+            return;
+        }
         switch (item.getType()){
 
             case ARROW -> {
