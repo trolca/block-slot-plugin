@@ -79,7 +79,6 @@ public class SeeSaveMenu extends Menu {
 
             case RED_DYE -> {
                 if(!Utils.isLocalizedEqual(item.getItemMeta(), "back")) return;
-
                 backMenu.open(player);
             }
 

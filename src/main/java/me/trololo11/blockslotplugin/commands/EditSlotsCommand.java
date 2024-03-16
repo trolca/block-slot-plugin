@@ -1,5 +1,6 @@
 package me.trololo11.blockslotplugin.commands;
 
+import me.trololo11.blockslotplugin.listeners.RenameSavesListener;
 import me.trololo11.blockslotplugin.managers.SavesManager;
 import me.trololo11.blockslotplugin.managers.SlotsManager;
 import me.trololo11.blockslotplugin.menus.MainEditSlotsMenu;
@@ -14,14 +15,16 @@ public class EditSlotsCommand implements CommandExecutor {
 
     private SlotsManager slotsManager;
     private SavesManager savesManager;
+    private RenameSavesListener renameSavesListener;
 
-    public EditSlotsCommand(SlotsManager slotsManager, SavesManager savesManager){
+    public EditSlotsCommand(SlotsManager slotsManager, SavesManager savesManager, RenameSavesListener renameSavesListener){
         this.slotsManager = slotsManager;
         this.savesManager = savesManager;
+        this.renameSavesListener = renameSavesListener;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand( CommandSender sender, Command command, String label, String[] args) {
 
         if(!(sender instanceof Player player)) return true;
 
@@ -36,7 +39,7 @@ public class EditSlotsCommand implements CommandExecutor {
             return true;
         }
 
-        new MainEditSlotsMenu(editPlayer,slotsManager,savesManager).open(player);
+        new MainEditSlotsMenu(editPlayer,slotsManager,savesManager, renameSavesListener).open(player);
 
         return true;
     }

@@ -213,7 +213,7 @@ public class MySqlDatabase implements DatabaseManager{
     @Override
     public ArrayList<Save> getPlayerSaves(UUID playersUuid) throws SQLException, IOException {
         Connection connection = getConnection();
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM player_saves WHERE uuid = ? ORDER BY save_index DESC");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM player_saves WHERE uuid = ? ORDER BY save_index ASC");
 
         statement.setString(1, playersUuid.toString());
         ResultSet results = statement.executeQuery();

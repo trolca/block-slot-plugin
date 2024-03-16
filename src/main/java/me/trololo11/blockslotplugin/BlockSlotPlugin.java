@@ -2,10 +2,7 @@ package me.trololo11.blockslotplugin;
 
 import me.trololo11.blockslotplugin.commands.EditSlotsCommand;
 import me.trololo11.blockslotplugin.commands.TestCommand;
-import me.trololo11.blockslotplugin.listeners.MenuManager;
-import me.trololo11.blockslotplugin.listeners.PlayerSavesDataLoader;
-import me.trololo11.blockslotplugin.listeners.SlotsEditBlock;
-import me.trololo11.blockslotplugin.listeners.PlayerSlotDataLoader;
+import me.trololo11.blockslotplugin.listeners.*;
 import me.trololo11.blockslotplugin.managers.DatabaseManager;
 import me.trololo11.blockslotplugin.managers.MySqlDatabase;
 import me.trololo11.blockslotplugin.managers.SavesManager;
@@ -36,6 +33,7 @@ public final class BlockSlotPlugin extends JavaPlugin {
         dbProperties.setProperty("initializationFailTimeout", "20000");
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Override
     public void onEnable() {
         getConfig().options().copyDefaults(true);
@@ -54,6 +52,7 @@ public final class BlockSlotPlugin extends JavaPlugin {
         }
         slotsManager = new SlotsManager();
         savesManager = new SavesManager(databaseManager);
+        RenameSavesListener renameSavesListener = new RenameSavesListener();
 
         try {
             loadData();
@@ -63,12 +62,13 @@ public final class BlockSlotPlugin extends JavaPlugin {
         }
 
         getCommand("testcommand").setExecutor(new TestCommand(slotsManager));
-        getCommand("editslots").setExecutor(new EditSlotsCommand(slotsManager, savesManager));
+        getCommand("editslots").setExecutor(new EditSlotsCommand(slotsManager, savesManager, renameSavesListener));
 
         getServer().getPluginManager().registerEvents(new MenuManager(), this);
         getServer().getPluginManager().registerEvents(new PlayerSlotDataLoader(databaseManager, slotsManager), this);
         getServer().getPluginManager().registerEvents(new PlayerSavesDataLoader(savesManager, databaseManager), this);
         getServer().getPluginManager().registerEvents(new SlotsEditBlock(), this);
+        getServer().getPluginManager().registerEvents(renameSavesListener, this);
 
     }
 
