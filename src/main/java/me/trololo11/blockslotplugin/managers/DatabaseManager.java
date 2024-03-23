@@ -71,6 +71,15 @@ public interface DatabaseManager {
     void updatePlayerSave(UUID playersUuid, int saveIndex, Save save) throws SQLException, IOException;
 
     /**
+     * Changes the save index and makes the save indexes after it
+     * +1.
+     * @param playerUuid The uuid of the player.
+     * @param originalIndex The original index of the save.
+     * @param changeToIndex The index you want to swap to.
+     */
+    void changePlayerSaveIndex(UUID playerUuid, int originalIndex, int changeToIndex);
+
+    /**
      * Removes a specified players save. <br>
      * This function also remaps every save's index which is after.
      * @param playersUuid The player's uuid which save it is.

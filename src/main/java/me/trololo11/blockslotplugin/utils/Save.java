@@ -7,8 +7,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class represents a players save
@@ -54,17 +54,14 @@ public class Save {
      * @param lore The lore to put in this item.
      * @return A display item of this save class.
      */
-    public ItemStack createSaveItem(int index, String... lore){
-        ArrayList<String> loreArray = new ArrayList<>(lore.length);
-        for(String s : lore) {
-            loreArray.add(Utils.chat(s));
-        }
+    public ItemStack createSaveItem(int index, List<String> lore){
         ItemStack saveItem = new ItemStack(this.icon);
         ItemMeta saveMeta = saveItem.getItemMeta();
 
+        assert saveMeta != null;
         saveMeta.setDisplayName(Utils.chat("&2&lSave &a&l"+(index+1)+"&2&l: &a&l"+this.name));
         saveMeta.setLocalizedName("save-"+index);
-        saveMeta.setLore(loreArray);
+        saveMeta.setLore(lore);
         saveMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
 
         saveItem.setItemMeta(saveMeta);

@@ -41,6 +41,7 @@ public abstract class SlotsEditingMenu extends Menu{
         for(Map.Entry<SlotType, CustomSlot> customSlot : slotsManager.getCustomSlotsMap().entrySet()){
             ItemStack item = customSlot.getValue().getItem();
             ItemMeta itemMeta = item.getItemMeta();
+            assert itemMeta != null;
             itemMeta.setLocalizedName("inv"+itemMeta.getLocalizedName());
             item.setItemMeta(itemMeta);
 
@@ -88,6 +89,7 @@ public abstract class SlotsEditingMenu extends Menu{
         inventory.setItem(6, clearInventory);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Override
     public void handleMenu(InventoryClickEvent e) {
         ItemStack item = e.getCurrentItem();
@@ -104,7 +106,6 @@ public abstract class SlotsEditingMenu extends Menu{
                 }else if(Utils.isLocalizedEqual(item.getItemMeta(), "offhand-slot")){
                     inventory.setItem(e.getSlot(), slotsItems.get(SlotType.BLOCKED));
                     currSlots[36] = SlotType.BLOCKED;
-
                 }
             }
 

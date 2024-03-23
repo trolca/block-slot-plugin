@@ -7,3 +7,5 @@ commands:
     description: "A test command!"
   editslots:
     description: "Edit someones slots"
+  seesaves:
+    description: "See your slot saves"

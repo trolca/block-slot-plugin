@@ -71,7 +71,7 @@ public class MainEditSlotsMenu extends SlotsEditingMenu {
             case BLUE_DYE -> {
                 if(!Utils.isLocalizedEqual(item.getItemMeta(), "load-save")) return;
 
-                new SelectSaveMenu(this, savesManager, slotsManager).open(player);
+                new SelectSaveMenu(this, slotsManager, savesManager, player).open(player);
             }
 
             //back

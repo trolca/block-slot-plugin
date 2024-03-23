@@ -1,6 +1,7 @@
 package me.trololo11.blockslotplugin;
 
 import me.trololo11.blockslotplugin.commands.EditSlotsCommand;
+import me.trololo11.blockslotplugin.commands.SeeSavesCommand;
 import me.trololo11.blockslotplugin.commands.TestCommand;
 import me.trololo11.blockslotplugin.listeners.*;
 import me.trololo11.blockslotplugin.managers.DatabaseManager;
@@ -61,15 +62,15 @@ public final class BlockSlotPlugin extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
-        getCommand("testcommand").setExecutor(new TestCommand(slotsManager));
-        getCommand("editslots").setExecutor(new EditSlotsCommand(slotsManager, savesManager, renameSavesListener));
-
         getServer().getPluginManager().registerEvents(new MenuManager(), this);
         getServer().getPluginManager().registerEvents(new PlayerSlotDataLoader(databaseManager, slotsManager), this);
         getServer().getPluginManager().registerEvents(new PlayerSavesDataLoader(savesManager, databaseManager), this);
         getServer().getPluginManager().registerEvents(new SlotsEditBlock(), this);
         getServer().getPluginManager().registerEvents(renameSavesListener, this);
 
+        getCommand("testcommand").setExecutor(new TestCommand(slotsManager));
+        getCommand("editslots").setExecutor(new EditSlotsCommand(slotsManager, savesManager, renameSavesListener));
+        getCommand("seesaves").setExecutor(new SeeSavesCommand(savesManager, slotsManager));
     }
 
     @Override

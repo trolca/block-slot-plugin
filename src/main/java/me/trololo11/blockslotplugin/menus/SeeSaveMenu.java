@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
+
 public class SeeSaveMenu extends Menu {
 
     private Menu backMenu;
@@ -16,7 +18,7 @@ public class SeeSaveMenu extends Menu {
     private boolean allowEdit;
     private ConfirmSaveFunction confirmFunction;
 
-    public SeeSaveMenu(Menu backMenu, SlotsManager slotsManager, Save save,int index, boolean allowEdit, ConfirmSaveFunction confirmFunction){
+    public SeeSaveMenu(Menu backMenu, SlotsManager slotsManager, Save save, int index, boolean allowEdit, @Nullable ConfirmSaveFunction confirmFunction){
         this.backMenu = backMenu;
         this.slotsManager = slotsManager;
         this.save = save;
@@ -64,7 +66,7 @@ public class SeeSaveMenu extends Menu {
         inventory.setItem(4, slots[36] == null ? freeSlot : slotsManager.getSlotClass(slots[36]).getItem());
         inventory.setItem(0, backButton);
         inventory.setItem(2, iconSave);
-        inventory.setItem(8, confirm);
+        if(confirmFunction != null) inventory.setItem(8, confirm);
         if(allowEdit)
             inventory.setItem(6, Utils.createItem(Material.ORANGE_DYE, "&6&lEdit save", "edit-save"));
     }
@@ -84,6 +86,7 @@ public class SeeSaveMenu extends Menu {
 
             case GREEN_DYE -> {
                 if(!Utils.isLocalizedEqual(item.getItemMeta(), "confirm")) return;
+                if(confirmFunction == null) return;
 
                 confirmFunction.run(save);
             }

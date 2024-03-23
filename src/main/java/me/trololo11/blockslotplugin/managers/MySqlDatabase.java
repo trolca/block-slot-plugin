@@ -188,6 +188,19 @@ public class MySqlDatabase implements DatabaseManager{
         connection.close();
     }
 
+    //TODO finish editing order of saves.
+    /**
+     * Changes the save index and makes the save indexes after it
+     * +1.
+     * @param playerUuid    The uuid of the player.
+     * @param originalIndex The original index of the save.
+     * @param changeToIndex The index you want to swap to.
+     */
+    @Override
+    public void changePlayerSaveIndex(UUID playerUuid, int originalIndex, int changeToIndex) {
+
+    }
+
     @Override
     public void removePlayerSave(UUID playersUuid, int saveIndex) throws SQLException {
         Connection connection = getConnection();
